@@ -1,5 +1,6 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron'
 import * as path from 'path'
+import * as request from 'request'
 import * as isDev from 'electron-is-dev'
 import * as fs from 'fs'
 import * as url from "url";
@@ -8,6 +9,7 @@ import { template } from "./applicationMenu";
 
 
 const BASE_URL = 'http://localhost:3000'
+const SERVER_URL = 'https://ytcd.ziho.kr'
 
 let window: BrowserWindow | null
 
@@ -34,10 +36,19 @@ switch (process.platform) {
 export let DOWNLOAD_PATH = path.join(app.getPath('documents'), DOWNLOAD_DIRNAME)
 export let EXPORT_PATH = path.join(app.getPath('documents'), EXPORT_DIRNAME)
 
+
 export const CONFIG_FILE_PATH = path.join(app.getPath('userData'), 'config.txt')
 if (!fs.existsSync(CONFIG_FILE_PATH)) {
-    fs.writeFileSync(CONFIG_FILE_PATH, `DOWNLOAD_PATH=${DOWNLOAD_PATH}\nEXPORT_PATH=${EXPORT_PATH}`)
+    fs.writeFileSync(CONFIG_FILE_PATH, `DOWNLOAD_PATH=${DOWNLOAD_PATH}\nEXPORT_PATH=${EXPORT_PATH}\nKEY=0`)
 }
+
+export let KEY;
+fs.readFileSync(CONFIG_FILE_PATH, { encoding: 'utf8', flag: 'r' }).split('\n').forEach((line) => {
+    const [key, value] = line.split('=')
+    if (key === 'KEY') {
+        KEY = value
+    }
+})
 
 export function loadPath() {
     fs.readFileSync(CONFIG_FILE_PATH, { encoding: 'utf8', flag: 'r' }).split('\n').forEach((line) => {
@@ -112,6 +123,19 @@ ipcMain.handle('QUEUE_VIDEO', (event, id: string) => {
         if (window !== null)
             window.webContents.send(code === 0 ? 'DOWNLOAD_COMPLETE' : 'DOWNLOAD_FAILED', {id: id, code: code})
     }
+
+    request({
+        url: SERVER_URL + '/check',
+        method: 'POST',
+        json: {key: KEY, id: id}
+    }, (err, httpResponse, body) => {
+        console.log(body.available)
+        if (!body.available) {
+            console.log('Already used')
+            window.webContents.send('DOWNLOAD_FAILED', {id: id, code: 123456789})
+        }
+    })
+
     console.log(`Downloading video: ${id}`)
 
     const python = spawn(
@@ -162,10 +186,24 @@ ipcMain.handle('EXPORT_VIDEO', (event, id: string, intervals: number[][]) => {
         ]
     ).on('close', (code) => {
         console.log(`ID: ${id}, Export Python script code: ${code}`)
+        request({
+            url: SERVER_URL + '/',
+            method: 'POST',
+            json: {key: KEY, id: id}
+        }, (err, httpResponse, body) => {
+            console.log(body)
+            if (body !== 'complete') {
+                window.webContents.send('ADD_FAILED', {id: id})
+            }
+        })
         sendCompleteMessage(code)
     }).stderr.on('data', (data) => {
         console.log(data.toString())
     })
+})
+ipcMain.handle('CHANGE_SERVER_KEY', (event: any, key: string) => {
+    fs.writeFileSync(CONFIG_FILE_PATH, `DOWNLOAD_PATH=${DOWNLOAD_PATH}\nEXPORT_PATH=${EXPORT_PATH}\nKEY=${key}`)
+    KEY = key
 })
 
 app.on('ready', () => {

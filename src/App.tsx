@@ -134,6 +134,26 @@ export default function App() {
                 }
             })
         })
+        ipcRenderer.on('ADD_FAILED', (event: any, message: { id: string }) => {
+            setDialog(setIsPopup, setCurrentDialog, (
+                <>
+                    <label>Adding to server failed: {message.id}</label>
+                </>
+            ))
+        })
+        ipcRenderer.on('PROMPT_SERVER_KEY', (event: any) => {
+            setDialog(setIsPopup, setCurrentDialog, (
+                <>
+                    <label>Enter a key</label>
+                    <input name="Key" id="keyPrompt" type="text"/>
+                    <EnterButton onClick={async () => {
+                        // @ts-ignore
+                        await ipcRenderer.invoke('CHANGE_SERVER_KEY', document.getElementById('keyPrompt').value)
+                        setIsPopup(false)
+                    }}>Save</EnterButton>
+                </>
+            ))
+        })
     }, [videoList, videoIndex, ipcRenderer])
 
     return (

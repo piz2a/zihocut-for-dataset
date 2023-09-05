@@ -1,7 +1,7 @@
 import { app, BrowserWindow, MenuItemConstructorOptions, shell, dialog } from 'electron'
 import * as isDev from 'electron-is-dev'
 import * as fs from 'fs'
-import {CONFIG_FILE_PATH, DOWNLOAD_PATH, EXPORT_PATH, loadPath} from "./electron"
+import {CONFIG_FILE_PATH, DOWNLOAD_PATH, EXPORT_PATH, KEY, loadPath} from "./electron"
 
 const isMac = process.platform === 'darwin'
 
@@ -41,7 +41,7 @@ async function changeDirectory(window: BrowserWindow, whatToChange: string) {
         whatToChange === DOWNLOAD_PATH ? newPath : DOWNLOAD_PATH
     }\nEXPORT_PATH=${
         whatToChange === EXPORT_PATH ? newPath : EXPORT_PATH
-    }`)
+    }\nKEY=${KEY}`)
 
     loadPath()
 }
@@ -60,6 +60,17 @@ export function template(window: BrowserWindow): MenuItemConstructorOptions[] {
                     click: async () => await changeDirectory(window, EXPORT_PATH)
                 },
                 isMac ? { role: 'close' } : { role: 'quit' }
+            ]
+        },
+        {
+            label: 'RnE',
+            submenu: [
+                {
+                    label: 'Change Server Key',
+                    click: async () => {
+                        window.webContents.send('PROMPT_SERVER_KEY')
+                    }
+                }
             ]
         },
         {
