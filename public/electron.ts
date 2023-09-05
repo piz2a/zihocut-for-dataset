@@ -1,4 +1,5 @@
 import { app, BrowserWindow, ipcMain, Menu } from 'electron'
+import * as contextMenu from "electron-context-menu";
 import * as path from 'path'
 import * as request from 'request'
 import * as isDev from 'electron-is-dev'
@@ -92,6 +93,7 @@ function createWindow() {
             contextIsolation: false,
             nodeIntegration: true,
             webSecurity: false,
+            spellcheck: true,
             allowRunningInsecureContent: true,
             preload: path.join(__dirname, 'preload.js'),
         },
@@ -205,6 +207,19 @@ ipcMain.handle('CHANGE_SERVER_KEY', (event: any, key: string) => {
     fs.writeFileSync(CONFIG_FILE_PATH, `DOWNLOAD_PATH=${DOWNLOAD_PATH}\nEXPORT_PATH=${EXPORT_PATH}\nKEY=${key}`)
     KEY = key
 })
+
+contextMenu({
+    prepend: (defaultActions, parameters, browserWindow) => [
+        {
+            label: 'Copy',
+            role: 'copy'
+        },
+        {
+            label: 'Paste',
+            role: 'paste'
+        }
+    ]
+});
 
 app.on('ready', () => {
     createWindow()
