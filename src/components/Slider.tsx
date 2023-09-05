@@ -1,15 +1,16 @@
 import '../styles/Slider.scss'
-import React, {useEffect, useState} from "react";
-import styled from "styled-components";
-import {MainComponentProps, setVideoProps, Video} from "../Interfaces";
-import {NEW_INTERVAL, NO_INTERVAL_SELECTED} from "./Editor";
-import {minAndSec} from "./IntervalWrapper";
+import React, {useEffect, useState} from "react"
+import styled from "styled-components"
+import {MainComponentProps, setVideoProps, Video} from "../Interfaces"
+import {NEW_INTERVAL, NO_INTERVAL_SELECTED} from "./Editor"
+import {minAndSec} from "./IntervalWrapper"
 
 
 export const logStep = -2
 const step = Math.pow(10, logStep)
 const defaultSliderColor = '#888888'
 const intervalSliderColor = '#ffc400'
+const intervalSliderColor2 = '#4cd221'
 
 export function getSliderValue(index: number) {
     return parseFloat(document.getElementsByClassName("range-slider")[0]
@@ -19,7 +20,7 @@ export function getSliderValue(index: number) {
 function updateIntervalSpan() {
     document.getElementsByClassName("range-slider")[0]
         .getElementsByClassName("rangeValues")[0].innerHTML
-        = `${minAndSec(getSliderValue(0))} - ${minAndSec(getSliderValue(1))}`
+        = `${minAndSec(getSliderValue(0))} - ${minAndSec(getSliderValue(1))} - ${minAndSec(getSliderValue(2))}`
 }
 
 function onChange(
@@ -33,8 +34,12 @@ function onChange(
     setRangeValue(parseFloat(event.target.value))
     const parent = document.getElementsByClassName("range-slider")[0]
     const slides = parent.getElementsByTagName("input");
-    if (parseFloat(slides[0].value) >= parseFloat(slides[1].value)) {
+    if (parseFloat(slides[0].value) >= parseFloat(slides[1].value) && index !== 2) {
         slides[index].value = (parseFloat(slides[-~-index].value) + (2 * index - 1) * step).toString()
+        setRangeValue(parseFloat(slides[index].value))
+    }
+    if (parseFloat(slides[1].value) >= parseFloat(slides[2].value) && index !== 0) {
+        slides[index].value = (parseFloat(slides[index === 1 ? 2 : 1].value) + (2 * index - 3) * step).toString()
         setRangeValue(parseFloat(slides[index].value))
     }
     updateIntervalSpan()
@@ -56,6 +61,7 @@ function saveInterval(
     videoList: Video[],
     setVideoList: React.Dispatch<React.SetStateAction<Video[]>>,
     from: number,
+    middle: number,
     to: number
 ) {
     if (intervalIndex === NEW_INTERVAL) intervalIndex = videoList[videoIndex].intervals.length
@@ -64,7 +70,7 @@ function saveInterval(
         videoIndex,
         [
             ...videoList[videoIndex].intervals.slice(0, intervalIndex),
-            { from: from.toString(), to: to.toString() },
+            { from: from.toString(), middle: middle.toString(), to: to.toString() },
             ...videoList[videoIndex].intervals.slice(intervalIndex + 1)
         ],
         videoList,
@@ -105,13 +111,14 @@ interface SliderProps extends MainComponentProps {
 export default function Slider(props: SliderProps) {
     const maxWidth = 760
 
-    const [init1, init2] = props.videoList[props.videoIndex].currentInterval === -1 ?
-        [Number((props.max * (1 / 5)).toFixed(-logStep)), Number((props.max * (3 / 5)).toFixed(-logStep))] :
+    const [init1, init2, init3] = props.videoList[props.videoIndex].currentInterval === -1 ?
+        [Number((props.max * (1 / 5)).toFixed(-logStep)), Number((props.max * (2 / 5)).toFixed(-logStep)), Number((props.max * (3 / 5)).toFixed(-logStep))] :
         [props.videoList[props.videoIndex].intervals[props.videoList[props.videoIndex].currentInterval]]
-            .map((interval) => [interval.from, interval.to])[0]
+            .map((interval) => [interval.from, interval.middle, interval.to])[0]
 
     const [rangeValue0, setRangeValue0] = useState(0)
     const [rangeValue1, setRangeValue1] = useState(0)
+    const [rangeValue2, setRangeValue2] = useState(0)
 
     const setSliderValue = (index: number, value: number) => {
         document.getElementsByClassName("range-slider")[0].getElementsByTagName("input")[index].value = value.toString();
@@ -123,7 +130,8 @@ export default function Slider(props: SliderProps) {
         updateIntervalSpan()
         setRangeValue0(init1)
         setRangeValue1(init2)
-    }, [init1, init2])
+        setRangeValue2(init3)
+    }, [init1, init2, init3])
 
     return (
         <>
@@ -138,7 +146,12 @@ export default function Slider(props: SliderProps) {
                            onChange={(event) => {
                                onChange(props.playerRef, event, rangeValue0, rangeValue1, setRangeValue1, 1)
                            }}/>
+                    <input className="range3" defaultValue={init3} min={0} max={props.max} step={step} type="range"
+                           onChange={(event) => {
+                               onChange(props.playerRef, event, rangeValue0, rangeValue1, setRangeValue2, 2)
+                           }}/>
                     <SliderFillTrack style={{width: `${maxWidth}px`}} color={defaultSliderColor}/>
+                    <SliderFillTrack style={{width: `${rangeValue2 / props.max * maxWidth}px`}} color={intervalSliderColor2}/>
                     <SliderFillTrack style={{width: `${rangeValue1 / props.max * maxWidth}px`}} color={intervalSliderColor}/>
                     <SliderFillTrack style={{width: `${rangeValue0 / props.max * maxWidth}px`}} color={defaultSliderColor}/>
                 </section>
@@ -169,7 +182,8 @@ export default function Slider(props: SliderProps) {
                     props.videoList,
                     props.setVideoList,
                     getSliderValue(0),
-                    getSliderValue(1)
+                    getSliderValue(1),
+                    getSliderValue(2)
                 )} className="customButton saveIntervalButton">
                     {props.videoList[props.videoIndex].currentInterval === NEW_INTERVAL ?
                         "Add interval" :

@@ -1,9 +1,9 @@
 import ReactPlayer from "react-player"
 import React, {useEffect, useRef, useState} from "react"
-import {MainComponentProps, setVideoProps, Video, videoStatus} from "../Interfaces";
-import Slider from "./Slider";
-import IntervalWrapper from "./IntervalWrapper";
-import {EnterButton, setDialog} from "./Dialog";
+import {MainComponentProps, setVideoProps, Video, videoStatus} from "../Interfaces"
+import Slider from "./Slider"
+import IntervalWrapper from "./IntervalWrapper"
+import {EnterButton, setDialog} from "./Dialog"
 import '../styles/Editor.scss'
 import '../styles/Footer.scss'
 
@@ -19,7 +19,7 @@ function createInterval(
     setVideoProps('currentInterval', videoIndex, NEW_INTERVAL, videoList, setVideoList)
 }
 
-function exportVideo( { videoList, setVideoList, videoIndex, setIsPopup, setCurrentDialog }: MainComponentProps) {
+function exportVideo({ videoList, setVideoList, videoIndex, setIsPopup, setCurrentDialog }: MainComponentProps) {
     if (videoList[videoIndex].currentInterval !== NO_INTERVAL_SELECTED) {
         setDialog(setIsPopup, setCurrentDialog, (
             <>
@@ -39,7 +39,7 @@ function exportVideo( { videoList, setVideoList, videoIndex, setIsPopup, setCurr
         return
     }
     const { ipcRenderer } = window.require('electron')
-    ipcRenderer.invoke('EXPORT_VIDEO', videoList[videoIndex].id, videoList[videoIndex].intervals.map((interval) => [interval.from, interval.to]))
+    ipcRenderer.invoke('EXPORT_VIDEO', videoList[videoIndex].id, videoList[videoIndex].intervals.map((interval) => [interval.from, interval.middle, interval.to]))
     setVideoProps("status", videoIndex, videoStatus.EXPORTING, videoList, setVideoList)
 }
 

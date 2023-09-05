@@ -1,8 +1,8 @@
 import React from "react"
-import {Interval, setVideoProps, IndexComponentProps, MainComponentProps} from "../Interfaces";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faPencil, faX} from "@fortawesome/free-solid-svg-icons";
-import {logStep} from "./Slider";
+import {Interval, setVideoProps, IndexComponentProps, MainComponentProps} from "../Interfaces"
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import {faPencil, faX} from "@fortawesome/free-solid-svg-icons"
+import {logStep} from "./Slider"
 import '../styles/IntervalWrapper.scss'
 
 
@@ -18,11 +18,12 @@ export function minAndSec(time: number) {
 
 interface IntervalComponentProps extends IndexComponentProps {
     t1: number
+    tm: number
     t2: number
 }
 
 function IntervalComponent(
-    { index, t1, t2, videoList, setVideoList, videoIndex }: IntervalComponentProps
+    { index, t1, tm, t2, videoList, setVideoList, videoIndex }: IntervalComponentProps
 ) {
     const editInterval = () => {
         if (videoList[videoIndex].currentInterval === -2) {
@@ -51,7 +52,7 @@ function IntervalComponent(
 
     return (
         <div className="interval">
-            <span>{minAndSec(t1)} ~ {minAndSec(t2)}</span>
+            <span>{minAndSec(t1)} - {minAndSec(tm)} - {minAndSec(t2)}</span>
             <button className={`edit customButton ${videoList[videoIndex].currentInterval === -2 ? 'enabledButton' : ''}`}
                     onClick={editInterval}>
                 <FontAwesomeIcon icon={faPencil} />
@@ -67,6 +68,7 @@ function IntervalComponent(
 export default function IntervalWrapper(props: MainComponentProps) {
     const intervals = props.videoList[props.videoIndex].intervals.map(
         (currentValue: Interval, index: number) => <IntervalComponent t1={currentValue.from}
+                                                                      tm={currentValue.middle}
                                                                       t2={currentValue.to}
                                                                       index={index}
                                                                       {...props}/>

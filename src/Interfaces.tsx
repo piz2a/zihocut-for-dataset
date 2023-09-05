@@ -2,6 +2,7 @@ import React, {JSX} from "react"
 
 export interface Interval {
     from: number
+    middle: number
     to: number
 }
 

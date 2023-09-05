@@ -1,7 +1,7 @@
 .slider {
   section.range-slider {
     position: relative;
-    width: 200px;
+    width: 320px;
     height: 35px;
     text-align: center;
   }
@@ -25,13 +25,20 @@
     background: transparent;
 
     &.range1 {
-      z-index: 13;
+      z-index: 14;
       &::-webkit-slider-thumb {
         background: #ff5e5e;
       }
     }
 
     &.range2 {
+      z-index: 13;
+      &::-webkit-slider-thumb {
+        background: #c20cff;
+      }
+    }
+
+    &.range3 {
       z-index: 12;
       &::-webkit-slider-thumb {
         background: #5e5eff;

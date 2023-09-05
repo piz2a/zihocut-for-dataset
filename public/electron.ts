@@ -143,7 +143,7 @@ ipcMain.handle('QUEUE_VIDEO', (event, id: string) => {
 })
 ipcMain.handle('EXPORT_VIDEO', (event, id: string, intervals: number[][]) => {
     intervals.forEach((interval) => {
-        console.log(interval[0], interval[1])
+        console.log(...interval)
     })
     const sendCompleteMessage = (code: number | null) => {
         if (window !== null)
@@ -158,7 +158,7 @@ ipcMain.handle('EXPORT_VIDEO', (event, id: string, intervals: number[][]) => {
             id,
             DOWNLOAD_PATH,
             EXPORT_PATH,
-            ...intervals.map((interval) => `${interval[0]}-${interval[1]}`)
+            ...intervals.map((interval) => `${interval[0]}-${interval[1]}-${interval[2]}`)
         ]
     ).on('close', (code) => {
         console.log(`ID: ${id}, Export Python script code: ${code}`)

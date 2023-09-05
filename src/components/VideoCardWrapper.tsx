@@ -6,11 +6,11 @@ import {
     Video,
     videoStatus
 } from "../Interfaces";
-import {NO_INTERVAL_SELECTED} from "./Editor";
-import {updateVideoIndex} from "../App";
+import {NO_INTERVAL_SELECTED} from "./Editor"
+import {updateVideoIndex} from "../App"
 import '../styles/VideoCardWrapper.scss'
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faX} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import {faX} from "@fortawesome/free-solid-svg-icons"
 
 
 function VideoCard({ index, videoList, setVideoList, videoIndex, setVideoIndex }: IndexComponentProps) {
