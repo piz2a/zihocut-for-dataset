@@ -24,9 +24,9 @@ elif sys.argv[1] == 'export':
 
     for i, arg in enumerate(sys.argv[5:]):
         interval = list(map(float, arg.split('-')))
-        targetPath1 = f"{exportVideoPath}/{videoId}_({interval[0]}-{interval[1]})_{i+1}.mp4"
+        targetPath1 = f"{exportVideoPath}/{videoId}_({interval[0]}-{interval[1]}-{interval[2]})_{i+1}.mp4"
         videoFileClip.subclip(interval[0], interval[1]).write_videofile(targetPath1, fps=24)
-        targetPath2 = f"{exportVideoPath}/{videoId}_({interval[1]}-{interval[2]})_{i+1}.mp4"
+        targetPath2 = f"{exportVideoPath}/{videoId}_({interval[0]}-{interval[1]}-{interval[2]})_{i+1}_train.mp4"
         videoFileClip.subclip(interval[1], interval[2]).write_videofile(targetPath2, fps=24)
 
     videoFileClip.reader.close()

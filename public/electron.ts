@@ -43,7 +43,7 @@ if (!fs.existsSync(CONFIG_FILE_PATH)) {
     fs.writeFileSync(CONFIG_FILE_PATH, `DOWNLOAD_PATH=${DOWNLOAD_PATH}\nEXPORT_PATH=${EXPORT_PATH}\nKEY=0`)
 }
 
-export let KEY;
+export let KEY: string;
 fs.readFileSync(CONFIG_FILE_PATH, { encoding: 'utf8', flag: 'r' }).split('\n').forEach((line) => {
     const [key, value] = line.split('=')
     if (key === 'KEY') {
@@ -134,7 +134,7 @@ ipcMain.handle('QUEUE_VIDEO', (event, id: string) => {
         console.log(body.available)
         if (!body.available) {
             console.log('Already used')
-            window.webContents.send('DOWNLOAD_FAILED', {id: id, code: 123456789})
+            window?.webContents.send('DOWNLOAD_FAILED', {id: id, code: 123456789})
         }
     })
 
@@ -195,7 +195,7 @@ ipcMain.handle('EXPORT_VIDEO', (event, id: string, intervals: number[][]) => {
         }, (err, httpResponse, body) => {
             console.log(body)
             if (body !== 'complete') {
-                window.webContents.send('ADD_FAILED', {id: id})
+                window?.webContents.send('ADD_FAILED', {id: id})
             }
         })
         sendCompleteMessage(code)
