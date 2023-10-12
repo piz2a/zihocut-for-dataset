@@ -122,7 +122,7 @@ export default function Slider(props: SliderProps) {
 
     const setSliderValue = (index: number, value: number) => {
         document.getElementsByClassName("range-slider")[0].getElementsByTagName("input")[index].value = value.toString();
-        (index === 0 ? setRangeValue0 : setRangeValue1)(value)
+        (index === 0 ? setRangeValue0 : (index === 1 ? setRangeValue1 : setRangeValue2))(value)
         updateIntervalSpan()
     }
 
@@ -164,16 +164,22 @@ export default function Slider(props: SliderProps) {
                 }} className="customButton setSliderTimeButton">
                     Move
                     <span className="sliderIcon red"></span>
-                    to current time
                 </button>
                 <button onClick={() => {
-                    if (props.currentTime > rangeValue0) {
+                    if (rangeValue0 < props.currentTime && props.currentTime < rangeValue2) {
                         setSliderValue(1, props.currentTime)
                     }
                 }} className="customButton setSliderTimeButton">
                     Move
+                    <span className="sliderIcon purple"></span>
+                </button>
+                <button onClick={() => {
+                    if (props.currentTime > rangeValue1) {
+                        setSliderValue(2, props.currentTime)
+                    }
+                }} className="customButton setSliderTimeButton">
+                    Move
                     <span className="sliderIcon blue"></span>
-                    to current time
                 </button>
                 {/*<button onClick={() => testInterval(getSliderValue(0), getSliderValue(1))}>Play Interval</button>*/}
                 <button onClick={() => saveInterval(

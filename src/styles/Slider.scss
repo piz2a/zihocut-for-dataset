@@ -84,7 +84,7 @@
 
   .setSliderTimeButton {
     border-radius: 0.5em;
-    width: 12em;
+    width: 7em;
     padding-bottom: 0.3em;
 
     span.sliderIcon {
@@ -99,6 +99,10 @@
 
       &.red {
         background: #ff5e5e;
+      }
+
+      &.purple {
+        background: #c20cff;
       }
 
       &.blue {
